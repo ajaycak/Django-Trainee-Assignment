@@ -1,12 +1,8 @@
-from django.shortcuts import render
-
-# Create your views here.
 import threading
 from django.http import HttpResponse
 from .signals import my_signal
 from .models import AuditLog, Item
 from django.db import transaction
-
 
 def test_signal_view(request):
     print("View thread:", threading.current_thread().name)
@@ -19,7 +15,6 @@ def transaction_ok_view(request):
     print("transaction ok view thread:", threading.current_thread().name)
     with transaction.atomic():
         Item.objects.create(name="ok case")
-
     item_exists = Item.objects.filter(name="ok case").exists()
     auditlog_exists = AuditLog.objects.filter(message__contains="ok case").exists()
     response_text = f"Item exists: {item_exists}, AuditLog exists: {auditlog_exists}"
@@ -33,7 +28,6 @@ def transaction_rollback_view(request):
             raise Exception("Forced rollback")
     except Exception as e:
         print("Exception caught:", e)
-
     item_exists = Item.objects.filter(name="rollback case").exists()
     auditlog_exists = AuditLog.objects.filter(message__contains="rollback case").exists()
     response_text = f"Item exists: {item_exists}, AuditLog exists: {auditlog_exists}"

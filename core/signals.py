@@ -1,13 +1,12 @@
-import time
 import threading
+import time
 import django.dispatch
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from .models import Item, AuditLog
+from django.db import transaction
 
-
-
-# define a custom signal for Q1 & Q2
+# Custom signal for earlier Q1 and Q2
 my_signal = django.dispatch.Signal()
 
 def slow_receiver(sender, **kwargs):
@@ -18,14 +17,12 @@ def slow_receiver(sender, **kwargs):
 
 my_signal.connect(slow_receiver)
 
-
-# 4) connect a model signal receiver
-
-@receiver(post_save,sender=Item)
-def log_item_created(sender,instance,created,**kwargs):
-    print("signal reciever thread",threading.current_thread().name)
+# Transaction-aware receiver for Q3
+@receiver(post_save, sender=Item)
+def log_item_created(sender, instance, created, **kwargs):
+    print("Signal receiver thread:", threading.current_thread().name)
     if created:
-        print("creating auditlog inside reciever", threading.current_thread().name)
-        AuditLog.objects.create(message=f"Item {instance.id} created")
-
-
+        print("Creating AuditLog inside on_commit callback")
+        def callback():
+            AuditLog.objects.create(message=f"Item {instance.name} created")
+        transaction.on_commit(callback)
