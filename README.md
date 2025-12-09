@@ -92,5 +92,10 @@ I created two views:
 And console output:
 <img width="1324" height="297" alt="image" src="https://github.com/user-attachments/assets/f496baab-583c-401f-8205-23f2c3afc51a" />
 
+and the audits:
+
+<img width="1467" height="573" alt="image" src="https://github.com/user-attachments/assets/d1583cca-8e63-4963-b8a8-e05ac9131a69" />
+
+
 
 
